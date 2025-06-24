@@ -1,0 +1,13 @@
+.DS_Store
+# Ignore python cache files
+__pycache__/
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+# Ignore virtual environment directories
+venv/
+# Ignore Python bytecode files
+*.pyc
+# Ignore log files
+*.log
+# Ignore environment variable files
+.env
