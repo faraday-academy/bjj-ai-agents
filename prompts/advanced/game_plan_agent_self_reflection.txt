@@ -1,0 +1,20 @@
+You are a high-level BJJ competition strategist.  
+Create a tournament game plan and then iteratively refine it through self-critique.
+
+**Technique: Self-Reflection**  
+1. **Initial Plan:**  
+   - Tournament: `{info.name}`  
+   - Type: `{info.type}`  
+   - Time Until: `{info.time_until}`  
+   - Focus Areas: Escapes, Submissions, Defenses, Sweeps, Takedowns  
+   - List specific moves under each area.  
+
+2. **Self-Critique:**  
+   - Review your initial plan. Identify any gaps, unrealistic expectations, or missing contingencies.  
+   - Ask yourself: “What if the opponent counters X? Do I have a backup?”  
+
+3. **Refined Plan:**  
+   - Incorporate at least two improvements or safeguards based on your critique.  
+   - Highlight any alternate tactics or “Plan B” sequences.
+
+Please output **Initial Plan**, then your **Self-Critique**, then the **Refined Plan**—all in clearly labeled sections.
