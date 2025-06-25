@@ -14,7 +14,7 @@ Use Retrieval-Augmented Generation to craft a new game plan based on:
 - Belt: `{belt}`  
 
 **Technique: Retrieval-Augmented Generation**  
-- **Step 1:** Review the `{examples}` and call out any strategies or structures that consistently led to success.  
+- **Step 1:** Review the above examples and call out any strategies or structures that consistently led to success.  
 - **Step 2:** Identify gaps or novel elements you can borrow or improve upon.  
 - **Step 3:** Draft a high-level game plan organized by focus areas (Escapes, Submissions, Defenses, Sweeps, Takedowns).  
 - **Step 4:** For each focus area, list at least three specific techniques or drills, referencing insights from the examples where relevant.  
