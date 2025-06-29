@@ -231,7 +231,7 @@ with gr.Blocks(title="BJJ AI Agents", theme=gr.themes.Soft()) as demo:
                     )
             examples_button.click(
                 fn=generate_training_examples,
-                inputs=examples_count,
+                inputs=[examples_count],
                 outputs=examples_output,
             )
 

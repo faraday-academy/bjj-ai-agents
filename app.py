@@ -1,17 +1,15 @@
+from fastapi import FastAPI
 import gradio as gr
-from config import Config
 
-# Import our modules
+from config import Config
 from app.database import init_database, view_all_rows
 from app.agents.coach_agent import run_coach_agent, run_coach_agent_with_tools
 from app.agents.game_plan_agent import run_game_plan_agent, run_game_plan_agent_rag
 from app.agents.router_agent import run_router
 from app.evaluation import generate_examples
 
-# Validate configuration
 Config.validate()
 
-# Initialize database
 init_database()
 
 
@@ -231,9 +229,18 @@ with gr.Blocks(title="BJJ AI Agents", theme=gr.themes.Soft()) as demo:
                 outputs=examples_output,
             )
 
+demo.queue()
+
+app = FastAPI()
+app = gr.mount_gradio_app(app, demo, path="/")
+
+
 if __name__ == "__main__":
-    demo.launch(
-        server_name=Config.GRADIO_SERVER_NAME,
-        server_port=Config.GRADIO_SERVER_PORT,
-        share=True,
+    import uvicorn
+
+    uvicorn.run(
+        app,
+        host=Config.GRADIO_SERVER_NAME,
+        port=Config.GRADIO_SERVER_PORT,
+        reload=True,
     )
