@@ -78,7 +78,3 @@ ai_agent_conference/
 ├── README.md
 └── README_webapp.md
 ```
-
----
-
-*Built with Gradio, LangGraph, and OpenAI*
