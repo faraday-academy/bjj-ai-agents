@@ -2,8 +2,9 @@ from langgraph.graph import StateGraph, END
 from pydantic import BaseModel
 from typing import Optional
 from app.llm_utils import load_prompt, use_llm_clean
-from app.agents.coach_agent import run_coach_agent
+from app.agents.coach_agent import run_coach_agent_with_tools
 from app.agents.game_plan_agent import run_game_plan_agent
+from app.agents.injury_agent import run_injury_agent
 
 
 class TournamentInfo(BaseModel):
@@ -49,10 +50,11 @@ def llm_router(state: SharedState) -> SharedState:
         return state
 
 
-def coach_node_simple(state: SharedState) -> SharedState:
-    """Simple coach node"""
+def coach_node(state: SharedState) -> SharedState:
+    """Coach agent node using the real coach agent with tools"""
     try:
-        response = run_coach_agent(state.input)
+        # You may want to pass a personality from state in the future
+        response = run_coach_agent_with_tools(state.input)
         state.output = response
         state.agent_type = "coach"
         return state
@@ -63,8 +65,8 @@ def coach_node_simple(state: SharedState) -> SharedState:
         return state
 
 
-def game_plan_node_simple(state: SharedState) -> SharedState:
-    """Simple game plan node"""
+def game_plan_node(state: SharedState) -> SharedState:
+    """Game plan agent node using the real game plan agent"""
     try:
         response = run_game_plan_agent(state.input)
         state.output = response
@@ -77,15 +79,10 @@ def game_plan_node_simple(state: SharedState) -> SharedState:
         return state
 
 
-def injury_node_simple(state: SharedState) -> SharedState:
-    """Simple injury/health node"""
+def injury_node(state: SharedState) -> SharedState:
+    """Injury agent node using the real injury agent"""
     try:
-        # Load injury agent prompt
-        injury_prompt = load_prompt("injury_agent_prompt")
-
-        formatted_prompt = injury_prompt.format(user_input=state.input)
-
-        response = use_llm_clean(formatted_prompt)
+        response = run_injury_agent(state.input)
         state.output = response
         state.agent_type = "injury"
         return state
@@ -102,9 +99,9 @@ def build_router_graph():
 
     # Add nodes
     workflow.add_node("router", llm_router)
-    workflow.add_node("coach", coach_node_simple)
-    workflow.add_node("game_plan", game_plan_node_simple)
-    workflow.add_node("injury", injury_node_simple)
+    workflow.add_node("coach", coach_node)
+    workflow.add_node("game_plan", game_plan_node)
+    workflow.add_node("injury", injury_node)
 
     # Set entry point
     workflow.set_entry_point("router")
