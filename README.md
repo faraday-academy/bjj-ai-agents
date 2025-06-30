@@ -1,6 +1,6 @@
 ---
 title: BJJ AI Agents
-short_description: An AI-enabled BJJ coaching app with specialized agents for creating game, training, and nutrion plans.
+short_description: An AI-enabled BJJ coaching app with specialized agents.
 emoji: 🥋
 colorFrom: blue
 colorTo: purple
