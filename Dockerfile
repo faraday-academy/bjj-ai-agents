@@ -8,7 +8,8 @@ COPY pyproject.toml uv.lock ./
 
 RUN pip install uv
 
-RUN uv pip compile pyproject.toml -o requirements.txt
+# TODO: Some generated dependency versions are not working, so we're using the current requirements.txt file instead
+# RUN uv pip compile pyproject.toml -o requirements.txt
 
 FROM python:3.10-slim
 

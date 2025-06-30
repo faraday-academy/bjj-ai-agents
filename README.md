@@ -1,13 +1,13 @@
 ---
 title: BJJ AI Agents
+short_description: An AI-enabled BJJ coaching app with specialized agents for creating game, training, and nutrion plans.
 emoji: 🥋
 colorFrom: blue
 colorTo: purple
 sdk: gradio
-sdk_version: 4.0.0
+sdk_version: 5.35.0
 app_file: main.py
 pinned: false
-license: mit
 ---
 
 # BJJ AI Agents
