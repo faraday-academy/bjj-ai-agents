@@ -25,5 +25,5 @@ dependencies = [
     "gradio_modal"
 ]
 
-[tool.uv.overrides]
-"ipython" = ">=8,<9"
+[tool.uv]
+override-dependencies = ["ipython>=8,<9"]
