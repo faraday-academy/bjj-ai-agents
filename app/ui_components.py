@@ -60,7 +60,7 @@ def create_enhanced_ai_chat_tab():
         )
         with gr.Row():
             with gr.Column():
-                chatbot = gr.Chatbot(label="AI Chat History", type="messages")
+                chatbot = gr.Chatbot(label="Chat History", type="messages")
                 chat_state = gr.State(
                     []
                 )  # Stores the conversation as a list of message dicts

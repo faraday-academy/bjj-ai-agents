@@ -16,6 +16,7 @@ dependencies = [
     { name = "chromadb" },
     { name = "fastapi" },
     { name = "gradio" },
+    { name = "gradio-modal" },
     { name = "ipywidgets" },
     { name = "langchain" },
     { name = "langchain-community" },
@@ -35,6 +36,7 @@ requires-dist = [
     { name = "chromadb" },
     { name = "fastapi", specifier = ">=0.104.0" },
     { name = "gradio", specifier = ">=4.0.0" },
+    { name = "gradio-modal" },
     { name = "ipywidgets" },
     { name = "langchain" },
     { name = "langchain-community" },
@@ -862,6 +864,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/0b/91/a31536da8fd18ed1c1d5b05929b7291a7bfe5963dfcd37a20a42fc2194f0/gradio_client-1.10.3.tar.gz", hash = "sha256:9e99b88e47f05dc3b68e40a3f3f83819f8d0ddcd43466ad385fe42e137825774", size = 321637, upload-time = "2025-06-10T00:51:46.408Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/ea/72/1e76abc821f8efaaeb2e3bd727a6c97bf87c6a9a0ffacfed0647e587824a/gradio_client-1.10.3-py3-none-any.whl", hash = "sha256:941e7f8d9a160f88487e9780a3db2736a40ea2b8b69d53ffdb306e47ef658b76", size = 323599, upload-time = "2025-06-10T00:51:45.204Z" },
+]
+
+[[package]]
+name = "gradio-modal"
+version = "0.0.4"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "gradio" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e2/fd/3b383f9ee8d60625e9e26871ba4adcacbedeab132041b94290758e02e543/gradio_modal-0.0.4.tar.gz", hash = "sha256:717ae699072a171648cfa1b84bc153be84e92d04e9ad58c1bc59af68ef332726", size = 1180812, upload-time = "2024-10-15T23:46:06.134Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/05/3d/76f454de84ae1dccbf2b7023e933afb8dde5fdd89e9476786726ef770737/gradio_modal-0.0.4-py3-none-any.whl", hash = "sha256:d96e817d2e934d9e1b835b06474f45fd349b5ccea499d1536bfb4bd38f62dedb", size = 1106241, upload-time = "2024-10-15T23:46:04.13Z" },
 ]
 
 [[package]]
