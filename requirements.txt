@@ -143,7 +143,7 @@ importlib-metadata==8.7.0
     # via opentelemetry-api
 importlib-resources==6.5.2
     # via chromadb
-ipython==9.3.0
+ipython==8.37.0
     # via ipywidgets
 ipython-pygments-lexers==1.1.1
     # via ipython
