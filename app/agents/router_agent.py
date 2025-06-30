@@ -1,5 +1,4 @@
 from langgraph.graph import StateGraph, END
-from langchain_openai import ChatOpenAI
 from pydantic import BaseModel
 from typing import Optional
 from app.llm_utils import load_prompt, use_llm_clean
@@ -18,10 +17,11 @@ class SharedState(BaseModel):
     input: str
     output: str = ""
     agent_type: str = ""
+    router: str = ""
     tournament_info: Optional[TournamentInfo] = None
 
 
-def llm_router(state: SharedState) -> str:
+def llm_router(state: SharedState) -> SharedState:
     """Use LLM to determine which agent should handle the query"""
     try:
         router_prompt = load_prompt("router_prompt")
@@ -34,45 +34,50 @@ def llm_router(state: SharedState) -> str:
         response_lower = response.lower()
 
         if "coach" in response_lower:
-            return "coach"
+            state.router = "coach"
         elif "game_plan" in response_lower or "tournament" in response_lower:
-            return "game_plan"
+            state.router = "game_plan"
         elif "injury" in response_lower or "health" in response_lower:
-            return "injury"
+            state.router = "injury"
         else:
-            return "coach"  # Default to coach
+            state.router = "coach"  # Default to coach
+
+        return state
     except Exception as e:
         print(f"Error in router: {e}")
-        return "coach"
+        state.router = "coach"
+        return state
 
 
-def coach_node_simple(state: SharedState) -> dict:
+def coach_node_simple(state: SharedState) -> SharedState:
     """Simple coach node"""
     try:
         response = run_coach_agent(state.input)
         state.output = response
         state.agent_type = "coach"
-        return {"output": response, "agent_type": "coach"}
+        return state
     except Exception as e:
         error_msg = f"Error in coach agent: {str(e)}"
         state.output = error_msg
-        return {"output": error_msg, "agent_type": "coach"}
+        state.agent_type = "coach"
+        return state
 
 
-def game_plan_node_simple(state: SharedState) -> dict:
+def game_plan_node_simple(state: SharedState) -> SharedState:
     """Simple game plan node"""
     try:
         response = run_game_plan_agent(state.input)
         state.output = response
         state.agent_type = "game_plan"
-        return {"output": response, "agent_type": "game_plan"}
+        return state
     except Exception as e:
         error_msg = f"Error in game plan agent: {str(e)}"
         state.output = error_msg
-        return {"output": error_msg, "agent_type": "game_plan"}
+        state.agent_type = "game_plan"
+        return state
 
 
-def injury_node_simple(state: SharedState) -> dict:
+def injury_node_simple(state: SharedState) -> SharedState:
     """Simple injury/health node"""
     try:
         # Load injury agent prompt
@@ -83,11 +88,12 @@ def injury_node_simple(state: SharedState) -> dict:
         response = use_llm_clean(formatted_prompt)
         state.output = response
         state.agent_type = "injury"
-        return {"output": response, "agent_type": "injury"}
+        return state
     except Exception as e:
         error_msg = f"Error in injury agent: {str(e)}"
         state.output = error_msg
-        return {"output": error_msg, "agent_type": "injury"}
+        state.agent_type = "injury"
+        return state
 
 
 def build_router_graph():
@@ -106,7 +112,7 @@ def build_router_graph():
     # Add conditional edges
     workflow.add_conditional_edges(
         "router",
-        lambda x: x["router"],
+        lambda x: x.router,
         {"coach": "coach", "game_plan": "game_plan", "injury": "injury"},
     )
 

@@ -212,3 +212,85 @@ def save_evaluation_result(
         "feedback": feedback,
     }
     return save_data_to_sqlite("evaluation_results", data)
+
+
+def save_student_profile(student_data: Dict[str, Any]) -> int:
+    """Save or update student profile and return student ID"""
+    try:
+        conn = sqlite3.connect("bjj_app.db")
+        cursor = conn.cursor()
+
+        # Check if student already exists by name
+        cursor.execute(
+            "SELECT id FROM students WHERE name = ?", (student_data.get("name"),)
+        )
+        existing_student = cursor.fetchone()
+
+        if existing_student:
+            # Update existing student
+            student_id = existing_student[0]
+            set_clause = ", ".join(
+                [f"{key} = ?" for key in student_data.keys() if key != "name"]
+            )
+            values = [
+                student_data[key] for key in student_data.keys() if key != "name"
+            ] + [student_id]
+
+            query = f"UPDATE students SET {set_clause} WHERE id = ?"
+            cursor.execute(query, values)
+        else:
+            # Insert new student
+            columns = ", ".join(student_data.keys())
+            placeholders = ", ".join(["?" for _ in student_data])
+            values = list(student_data.values())
+
+            query = f"INSERT INTO students ({columns}) VALUES ({placeholders})"
+            cursor.execute(query, values)
+            student_id = cursor.lastrowid
+
+        conn.commit()
+        conn.close()
+        return student_id
+    except Exception as e:
+        print(f"Error saving student profile: {e}")
+        return -1
+
+
+def get_student_by_name(name: str) -> Optional[Dict[str, Any]]:
+    """Get student information by name"""
+    try:
+        conn = sqlite3.connect("bjj_app.db")
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT * FROM students WHERE name = ?", (name,))
+        row = cursor.fetchone()
+
+        conn.close()
+
+        if row:
+            columns = [description[0] for description in cursor.description]
+            return dict(zip(columns, row))
+        return None
+    except Exception as e:
+        print(f"Error getting student by name: {e}")
+        return None
+
+
+def get_all_students() -> List[Dict[str, Any]]:
+    """Get all students"""
+    try:
+        conn = sqlite3.connect("bjj_app.db")
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT * FROM students ORDER BY name")
+        rows = cursor.fetchall()
+
+        conn.close()
+
+        if rows:
+            columns = [description[0] for description in cursor.description]
+            return [dict(zip(columns, row)) for row in rows]
+        return []
+    except Exception as e:
+        print(f"Error getting all students: {e}")
+        return []

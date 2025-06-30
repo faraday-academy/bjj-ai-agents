@@ -1,12 +1,20 @@
-# (The full content of app.py, but with imports updated to use app and app.agents)
-
+from fastapi import FastAPI
 import gradio as gr
-from app.config import Config
-from app.database import init_database, view_all_rows
+from gradio_modal import Modal
+
+from app.database import (
+    init_database,
+    view_all_rows,
+    save_student_profile,
+    get_student_by_name,
+    get_all_students,
+)
 from app.agents.coach_agent import run_coach_agent, run_coach_agent_with_tools
 from app.agents.game_plan_agent import run_game_plan_agent, run_game_plan_agent_rag
 from app.agents.router_agent import run_router
 from app.evaluation import generate_examples
+from config import Config
+from app.user_guide import USER_GUIDE_CONTENT
 
 Config.validate()
 init_database()
@@ -39,15 +47,11 @@ def route_query(message: str) -> str:
         return f"Error: {str(e)}"
 
 
-def track_progress(
-    technique: str, level: str, notes: str, gender: str, no_gi_level: str
-) -> str:
+def track_progress(technique: str, level: str, no_gi_level: str, notes: str) -> str:
     try:
         from app.agents.coach_agent import track_student_progress
 
-        # Include gender and no-gi level in the tracking
-        progress_info = f"Gender: {gender}, No-Gi Level: {no_gi_level}\n"
-        return progress_info + track_student_progress(technique, level, notes)
+        return track_student_progress(technique, level, no_gi_level, notes)
     except Exception as e:
         return f"Error: {str(e)}"
 
@@ -70,174 +74,144 @@ def generate_training_examples(count: int = 5) -> str:
         return f"Error: {str(e)}"
 
 
+def save_student_info(
+    name: str, age: int, weight: float, belt: str, gender: str, no_gi_level: str
+) -> str:
+    """Save student information to database and local storage"""
+    try:
+        if not name.strip():
+            return "Error: Name is required"
+
+        # Prepare student data
+        student_data = {
+            "name": name.strip(),
+            "age": age if age > 0 else None,
+            "weight_class": f"{weight} lbs" if weight > 0 else None,
+            "belt_color": belt,
+            "gender": gender,
+            "no_gi_level": no_gi_level,
+        }
+
+        # Save to database
+        student_id = save_student_profile(student_data)
+
+        if student_id > 0:
+            # Save to local storage (simulated with a message)
+            storage_message = f"Profile saved to local storage for {name}"
+            return f"✅ Profile saved successfully! Student ID: {student_id}\n{storage_message}"
+        else:
+            return "❌ Error saving profile to database"
+
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+
+def load_student_info(name: str) -> str:
+    """Load student information from database"""
+    try:
+        if not name.strip():
+            return "Please enter a name to search"
+
+        student = get_student_by_name(name.strip())
+
+        if student:
+            info = f"📋 Student Profile for {student['name']}:\n"
+            info += f"Age: {student['age'] or 'Not specified'}\n"
+            info += f"Weight: {student['weight_class'] or 'Not specified'}\n"
+            info += f"Belt: {student['belt_color'] or 'Not specified'}\n"
+            info += f"Gender: {student['gender'] or 'Not specified'}\n"
+            info += f"No-Gi Level: {student.get('no_gi_level', 'Not specified')}\n"
+            info += f"Student ID: {student['id']}"
+            return info
+        else:
+            return f"No student found with name: {name}"
+
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+
+def list_all_students() -> str:
+    """List all students in the database"""
+    try:
+        students = get_all_students()
+
+        if students:
+            result = "📚 All Students:\n\n"
+            for student in students:
+                result += f"• {student['name']} - {student['belt_color'] or 'No belt'} - {student['gender'] or 'Not specified'}\n"
+            return result
+        else:
+            return "No students found in database"
+
+    except Exception as e:
+        return f"Error: {str(e)}"
+
+
+# Import UI components
+from app.ui_components import (
+    create_help_section,
+    create_enhanced_ai_chat_tab,
+    create_coach_chat_tab,
+    create_game_plan_tab,
+    create_progress_tracking_tab,
+    create_student_profile_tab,
+    create_student_search_tab,
+    create_list_students_tab,
+    create_database_viewer_tab,
+    create_training_examples_tab,
+)
+
+# Override placeholder functions with actual implementations
+import app.ui_components as ui_components
+
+ui_components.route_query = route_query
+ui_components.chat_with_coach = chat_with_coach
+ui_components.get_game_plan = get_game_plan
+ui_components.track_progress = track_progress
+ui_components.save_student_info = save_student_info
+ui_components.load_student_info = load_student_info
+ui_components.list_all_students = list_all_students
+ui_components.view_database = view_database
+ui_components.generate_training_examples = generate_training_examples
+
+
 with gr.Blocks(title="BJJ AI Agents", theme=gr.themes.Soft()) as demo:
     gr.Markdown("# 🥋 BJJ AI Agents System")
-    gr.Markdown("Welcome to the Brazilian Jiu-Jitsu AI coaching system!")
+
+    # Help button in top right
+    with gr.Row():
+        gr.Markdown("Welcome to the Brazilian Jiu-Jitsu AI coaching system!")
+        help_button = gr.Button("❓ Help & Info", size="sm", variant="secondary")
+
+    with Modal(visible=False) as help_modal:
+        gr.Markdown(USER_GUIDE_CONTENT)
+
+    help_button.click(lambda: gr.update(visible=True), None, help_modal)
 
     with gr.Tabs():
-        with gr.TabItem("🤖 Coach Chat"):
-            gr.Markdown("### Chat with your BJJ Coach")
-            with gr.Row():
-                with gr.Column():
-                    coach_input = gr.Textbox(
-                        label="Ask your coach anything about BJJ",
-                        placeholder="e.g., How do I escape from mount?",
-                        lines=3,
-                    )
-                    personality_input = gr.Dropdown(
-                        choices=["james", "lacey", "mat", "ryan"],
-                        label="Coach Personality",
-                        value="james",
-                        info="Choose your coach's personality and teaching style",
-                    )
-                    use_tools_checkbox = gr.Checkbox(
-                        label="Use advanced tools (video retrieval, progress tracking)",
-                        value=False,
-                    )
-                    coach_button = gr.Button("Ask Coach", variant="primary")
-                with gr.Column():
-                    coach_output = gr.Textbox(
-                        label="Coach's Response", lines=10, interactive=False
-                    )
-            coach_button.click(
-                fn=chat_with_coach,
-                inputs=[coach_input, personality_input, use_tools_checkbox],
-                outputs=coach_output,
-            )
+        # Create all tabs using the UI components
+        create_enhanced_ai_chat_tab()
+        create_coach_chat_tab()
+        create_game_plan_tab()
+        create_progress_tracking_tab()
+        create_student_profile_tab()
+        create_student_search_tab()
+        create_list_students_tab()
+        create_database_viewer_tab()
+        create_training_examples_tab()
 
-        with gr.TabItem("📋 Game Plan Generator"):
-            gr.Markdown("### Generate Tournament Game Plans")
-            with gr.Row():
-                with gr.Column():
-                    game_plan_input = gr.Textbox(
-                        label="Tournament Information",
-                        placeholder="e.g., I'm competing in the blue belt division, 155 lbs, male, intermediate no-gi level, against aggressive opponents...",
-                        lines=5,
-                    )
-                    use_rag_checkbox = gr.Checkbox(
-                        label="Use RAG (Retrieval Augmented Generation) for better plans",
-                        value=True,
-                    )
-                    game_plan_button = gr.Button(
-                        "Generate Game Plan", variant="primary"
-                    )
-                with gr.Column():
-                    game_plan_output = gr.Textbox(
-                        label="Generated Game Plan", lines=15, interactive=False
-                    )
-            game_plan_button.click(
-                fn=get_game_plan,
-                inputs=[game_plan_input, use_rag_checkbox],
-                outputs=game_plan_output,
-            )
 
-        with gr.TabItem("🎯 Smart Router"):
-            gr.Markdown(
-                "### AI Router - Automatically routes your query to the best agent"
-            )
-            with gr.Row():
-                with gr.Column():
-                    router_input = gr.Textbox(
-                        label="Ask anything about BJJ",
-                        placeholder="e.g., I need help with my tournament strategy...",
-                        lines=3,
-                    )
-                    router_button = gr.Button("Route Query", variant="primary")
-                with gr.Column():
-                    router_output = gr.Textbox(
-                        label="Response", lines=10, interactive=False
-                    )
-            router_button.click(
-                fn=route_query, inputs=router_input, outputs=router_output
-            )
+demo.queue()
 
-        with gr.TabItem("📊 Progress Tracking"):
-            gr.Markdown("### Track Your BJJ Progress")
-            with gr.Row():
-                with gr.Column():
-                    technique_input = gr.Textbox(
-                        label="Technique Name",
-                        placeholder="e.g., Triangle Choke",
-                        lines=1,
-                    )
-                    level_input = gr.Dropdown(
-                        choices=["Beginner", "Intermediate", "Advanced", "Mastered"],
-                        label="Current Level",
-                        value="Beginner",
-                    )
-                    gender_input = gr.Dropdown(
-                        choices=["Male", "Female", "Other"],
-                        label="Gender",
-                        value="Male",
-                    )
-                    no_gi_level_input = gr.Dropdown(
-                        choices=["Beginner", "Intermediate", "Advanced"],
-                        label="No-Gi Level",
-                        value="Beginner",
-                    )
-                    notes_input = gr.Textbox(
-                        label="Notes",
-                        placeholder="e.g., Struggling with the setup...",
-                        lines=3,
-                    )
-                    track_button = gr.Button("Track Progress", variant="primary")
-                with gr.Column():
-                    track_output = gr.Textbox(
-                        label="Progress Update", lines=5, interactive=False
-                    )
-            track_button.click(
-                fn=track_progress,
-                inputs=[
-                    technique_input,
-                    level_input,
-                    notes_input,
-                    gender_input,
-                    no_gi_level_input,
-                ],
-                outputs=track_output,
-            )
-
-        with gr.TabItem("🗄️ Database Viewer"):
-            gr.Markdown("### View Database Contents")
-            with gr.Row():
-                with gr.Column():
-                    table_input = gr.Dropdown(
-                        choices=["students", "game_plans", "progress_tracking"],
-                        label="Select Table",
-                        value="students",
-                    )
-                    db_button = gr.Button("View Data", variant="primary")
-                with gr.Column():
-                    db_output = gr.Textbox(
-                        label="Database Contents", lines=15, interactive=False
-                    )
-            db_button.click(fn=view_database, inputs=table_input, outputs=db_output)
-
-        with gr.TabItem("🎲 Training Examples"):
-            gr.Markdown("### Generate Training Examples")
-            with gr.Row():
-                with gr.Column():
-                    examples_count = gr.Slider(
-                        minimum=1,
-                        maximum=20,
-                        value=5,
-                        step=1,
-                        label="Number of Examples",
-                    )
-                    examples_button = gr.Button("Generate Examples", variant="primary")
-                with gr.Column():
-                    examples_output = gr.Textbox(
-                        label="Generated Examples", lines=15, interactive=False
-                    )
-            examples_button.click(
-                fn=generate_training_examples,
-                inputs=[examples_count],
-                outputs=examples_output,
-            )
+app = FastAPI()
+app = gr.mount_gradio_app(app, demo, path="")
 
 if __name__ == "__main__":
-    demo.launch(
-        server_name=Config.GRADIO_SERVER_NAME,
-        server_port=Config.GRADIO_SERVER_PORT,
-        share=True,
+    import uvicorn
+
+    uvicorn.run(
+        "main:app",
+        host=Config.GRADIO_SERVER_NAME,
+        port=Config.GRADIO_SERVER_PORT,
+        reload=True,
     )

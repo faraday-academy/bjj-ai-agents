@@ -5,5 +5,5 @@ Available agents:
 - game_plan: For tournament planning or match preparation. Any time the user
 - injury: For questions about injuries or recovery.
 
-User: {state.question}
+User: {user_input}
 Answer with just one word: coach, game_plan, or injury.
