@@ -17,7 +17,7 @@ def init_database():
             gender TEXT,
             belt_color TEXT,
             no_gi_level TEXT,
-            weight_class TEXT,
+            weight INTEGER,
             goals TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )

@@ -1,6 +1,10 @@
+import os
 from pathlib import Path
 from typing import Dict, List
+
 from langchain_openai import ChatOpenAI
+
+openai_api_key = os.getenv("OPENAI_API_KEY")
 
 
 def load_prompt(name: str) -> str:
@@ -40,33 +44,34 @@ def load_all_prompts() -> Dict[str, str]:
 
 def use_llm_raw(
     prompt: str,
-    model_name: str = "gpt-4",
-    temperature: float = 0.7,
-    max_tokens: int = 1000,
-    **kwargs,
+    model_name: str = "gpt-4o",
+    temperature: float = 0.0,
+    model_kwargs: dict | None = None,
 ) -> str:
-    """Use LLM with raw prompt"""
+    """Send a prompt to the specified OpenAI model and return the response content."""
+    if not openai_api_key:
+        raise ValueError(
+            "OpenAI API key must be provided or defined as `openai_api_key` in the global scope."
+        )
+
     try:
         llm = ChatOpenAI(
-            model=model_name, temperature=temperature, max_tokens=max_tokens, **kwargs
+            model=model_name,
+            temperature=temperature,
+            model_kwargs=model_kwargs or {},
+            openai_api_key=openai_api_key,
         )
-        response = llm.invoke(prompt)
-        return response.content
+        return llm.invoke(prompt).content
     except Exception as e:
         return f"Error calling LLM: {str(e)}"
 
 
 def use_llm_clean(prompt: str, **kwargs) -> str:
-    """Use LLM with cleaned prompt (removes markdown formatting)"""
-    try:
-        cleaned_prompt = prompt.replace("```", "").strip()
-        return use_llm_raw(cleaned_prompt, **kwargs)
-    except Exception as e:
-        return f"Error processing prompt: {str(e)}"
+    return use_llm_raw(prompt, **kwargs).strip()
 
 
 def get_llm_instance(
-    model_name: str = "gpt-4", temperature: float = 0.7, max_tokens: int = 1000
+    model_name: str = "gpt-4o", temperature: float = 0.7, max_tokens: int = 1000
 ) -> ChatOpenAI:
     """Get a configured LLM instance"""
     return ChatOpenAI(model=model_name, temperature=temperature, max_tokens=max_tokens)

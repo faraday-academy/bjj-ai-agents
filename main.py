@@ -15,6 +15,7 @@ from app.agents.router_agent import run_router
 from app.evaluation import generate_examples
 from config import Config
 from app.user_guide import USER_GUIDE_CONTENT
+from app.llm_utils import use_llm_clean
 
 Config.validate()
 init_database()
@@ -40,11 +41,15 @@ def get_game_plan(tournament_info: str, use_rag: bool = False) -> str:
         return f"Error: {str(e)}"
 
 
-def route_query(message: str) -> str:
-    try:
-        return run_router(message)
-    except Exception as e:
-        return f"Error: {str(e)}"
+def route_query(history) -> str:
+    # Extract the latest user message from the chat history
+    user_message = ""
+    for msg in reversed(history):
+        if msg["role"] == "user":
+            user_message = msg["content"]
+            break
+    # Call the router agent with the latest user message
+    return run_router(user_message)
 
 
 def track_progress(technique: str, level: str, no_gi_level: str, notes: str) -> str:
@@ -86,7 +91,7 @@ def save_student_info(
         student_data = {
             "name": name.strip(),
             "age": age if age > 0 else None,
-            "weight_class": f"{weight} lbs" if weight > 0 else None,
+            "weight": int(round(weight)) if weight > 0 else None,
             "belt_color": belt,
             "gender": gender,
             "no_gi_level": no_gi_level,
@@ -117,7 +122,7 @@ def load_student_info(name: str) -> str:
         if student:
             info = f"📋 Student Profile for {student['name']}:\n"
             info += f"Age: {student['age'] or 'Not specified'}\n"
-            info += f"Weight: {student['weight_class'] or 'Not specified'}\n"
+            info += f"Weight: {student['weight_class'] or 'Not specified'} lbs\n"
             info += f"Belt: {student['belt_color'] or 'Not specified'}\n"
             info += f"Gender: {student['gender'] or 'Not specified'}\n"
             info += f"No-Gi Level: {student.get('no_gi_level', 'Not specified')}\n"
@@ -188,15 +193,17 @@ with gr.Blocks(title="BJJ AI Agents", theme=gr.themes.Soft()) as demo:
 
     help_button.click(lambda: gr.update(visible=True), None, help_modal)
 
+    user_profile_state = gr.State({})
+
     with gr.Tabs():
-        # Create all tabs using the UI components
+        # Enhanced AI Chat tab (first)
         create_enhanced_ai_chat_tab()
+        # Student Profile Management tab (second)
+        create_student_profile_tab(user_profile_state=user_profile_state)
+        # Other tabs
         create_coach_chat_tab()
         create_game_plan_tab()
-        create_progress_tracking_tab()
-        create_student_profile_tab()
-        create_student_search_tab()
-        create_list_students_tab()
+        create_progress_tracking_tab(user_profile_state=user_profile_state)
         create_database_viewer_tab()
         create_training_examples_tab()
 

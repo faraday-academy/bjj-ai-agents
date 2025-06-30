@@ -48,14 +48,22 @@ def _determine_agent_type(response: str) -> tuple:
         return "🤖 AI Assistant", "#e2e3e5", "#383d41"
 
 
+def _routing_badge():
+    return _create_agent_badge("🔄 Routing to the best agent...", "#fff3cd", "#856404")
+
+
 def create_enhanced_ai_chat_tab():
-    """Create the Enhanced AI Chat tab"""
+    """Create the Enhanced AI Chat tab with chat history and context memory."""
     with gr.TabItem("🤖 Enhanced AI Chat"):
         gr.Markdown(
             "### Premium AI Assistant - Automatically routes your query to the best specialized agent"
         )
         with gr.Row():
             with gr.Column():
+                chatbot = gr.Chatbot(label="AI Chat History", type="messages")
+                chat_state = gr.State(
+                    []
+                )  # Stores the conversation as a list of message dicts
                 router_input = gr.Textbox(
                     label="Ask anything about BJJ",
                     placeholder="e.g., I need help with my tournament strategy...",
@@ -63,42 +71,40 @@ def create_enhanced_ai_chat_tab():
                 )
                 router_button = gr.Button("Get AI Response", variant="primary")
             with gr.Column():
-                # Agent badge to show which agent is working
                 ready_badge = _create_agent_badge(
                     "🤖 Ready to assist", "#f0f0f0", "#666"
                 )
                 agent_badge = gr.HTML(value=ready_badge, label="Current Agent")
-                router_output = gr.Textbox(
-                    label="AI Response", lines=10, interactive=False
-                )
 
-        # Custom function to update badge and get response
-        def get_ai_response_with_badge(message):
+        def get_ai_response_with_history(message, history, prog=gr.Progress()):
             if not message.strip():
-                return ready_badge, "Please enter a question to get started."
-
-            try:
-                # Get response from router
-                response = route_query(message)
-
-                # Determine which agent was used
-                agent_type, badge_color, text_color = _determine_agent_type(response)
-
-                # Create final badge
-                final_badge = _create_agent_badge(agent_type, badge_color, text_color)
-
-                return final_badge, response
-
-            except Exception as e:
-                error_badge = _create_agent_badge("❌ Error", "#f8d7da", "#721c24")
-                return error_badge, f"Error: {str(e)}"
+                return history, "", ready_badge, history
+            # Show routing badge immediately
+            prog(0, desc="Routing to the best agent...")
+            routing_badge = _routing_badge()
+            yield history, "", routing_badge, history
+            # Append user message to history
+            history = history or []
+            history.append({"role": "user", "content": message})
+            # Get AI response (pass context if your agent supports it)
+            response = route_query(message)
+            # Determine agent type for badge
+            agent_type, badge_color, text_color = _determine_agent_type(response)
+            final_badge = _create_agent_badge(agent_type, badge_color, text_color)
+            # Append AI response to history
+            history.append({"role": "assistant", "content": response})
+            yield history, "", final_badge, history
 
         router_button.click(
-            fn=get_ai_response_with_badge,
-            inputs=router_input,
-            outputs=[agent_badge, router_output],
+            fn=get_ai_response_with_history,
+            inputs=[router_input, chat_state],
+            outputs=[chatbot, router_input, agent_badge, chat_state],
+            show_progress=True,
+            api_name=None,
+            queue=True,
         )
-        return router_input, router_output, router_button
+        chatbot.change(lambda h: h, chatbot, chat_state)
+        return router_input, chatbot, router_button, chat_state
 
 
 def create_coach_chat_tab():
@@ -163,8 +169,8 @@ def create_game_plan_tab():
         return game_plan_input, game_plan_output, game_plan_button
 
 
-def create_progress_tracking_tab():
-    """Create the Progress Tracking tab"""
+def create_progress_tracking_tab(user_profile_state=None):
+    """Create the Progress Tracking tab, pre-filling from user profile state."""
     with gr.TabItem("📊 Progress Tracking"):
         gr.Markdown("### Track Your BJJ Progress")
         with gr.Row():
@@ -179,10 +185,21 @@ def create_progress_tracking_tab():
                     label="Current Level",
                     value="Beginner",
                 )
+
+                # Pre-fill from user profile state if available
+                def get_default_no_gi_level(state):
+                    return (
+                        state["no_gi_level"]
+                        if state and "no_gi_level" in state
+                        else "Beginner"
+                    )
+
                 no_gi_level_input = gr.Dropdown(
                     choices=["Beginner", "Intermediate", "Advanced"],
                     label="No-Gi Level",
-                    value="Beginner",
+                    value=get_default_no_gi_level(
+                        user_profile_state.value if user_profile_state else None
+                    ),
                 )
                 notes_input = gr.Textbox(
                     label="Notes",
@@ -202,8 +219,8 @@ def create_progress_tracking_tab():
         return technique_input, track_output, track_button
 
 
-def create_student_profile_tab():
-    """Create the Student Profile Management tab"""
+def create_student_profile_tab(user_profile_state=None):
+    """Create the Student Profile Management tab with local state."""
     with gr.TabItem("👤 Student Profile Management"):
         gr.Markdown("### Manage Student Profiles")
         with gr.Row():
@@ -223,10 +240,11 @@ def create_student_profile_tab():
                     label="Weight (lbs)",
                     value=0,
                     minimum=0,
-                    maximum=300,
+                    maximum=500,
+                    precision=0,  # Only allow integers
                 )
                 belt_input = gr.Dropdown(
-                    choices=["White", "Blue", "Purple", "Brown", "Black", "Other"],
+                    choices=["White", "Blue", "Purple", "Brown", "Black"],
                     label="Belt Color",
                     value="White",
                 )
@@ -243,8 +261,22 @@ def create_student_profile_tab():
                 save_button = gr.Button("Save Student Info", variant="primary")
             with gr.Column():
                 save_output = gr.Textbox(label="Result", lines=5, interactive=False)
+
+        # Save and update state
+        def save_and_update_state(name, age, weight, belt, gender, no_gi_level):
+            result = save_student_info(name, age, weight, belt, gender, no_gi_level)
+            profile = {
+                "name": name,
+                "age": age,
+                "weight": weight,
+                "belt": belt,
+                "gender": gender,
+                "no_gi_level": no_gi_level,
+            }
+            return result, profile
+
         save_button.click(
-            fn=save_student_info,
+            fn=save_and_update_state,
             inputs=[
                 name_input,
                 age_input,
@@ -253,7 +285,7 @@ def create_student_profile_tab():
                 gender_input,
                 no_gi_level_input,
             ],
-            outputs=save_output,
+            outputs=[save_output, user_profile_state],
         )
         return name_input, save_output, save_button
 
