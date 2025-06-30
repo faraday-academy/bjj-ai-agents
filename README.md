@@ -12,6 +12,8 @@ license: mit
 
 # BJJ AI Agents
 
+**NOTE**: This originated from a talk I gave at the Kansas City AI Agents Conference on June 25, 2025. [Here is the original notebook](https://github.com/faraday-academy/bjj-ai-agents-notebook) used for that talk.
+
 Run app locally with: `uv run uvicorn main:demo --reload --host 0.0.0.0 --port 7860`
 
 A comprehensive Brazilian Jiu-Jitsu AI coaching system with multiple specialized agents for different aspects of BJJ training and competition.
