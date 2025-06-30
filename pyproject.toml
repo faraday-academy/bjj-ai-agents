@@ -23,4 +23,7 @@ dependencies = [
     "pydantic>=2.0.0",
     "fastapi>=0.104.0",
     "gradio_modal"
-] 
+]
+
+[tool.uv.overrides]
+"ipython" = ">=8,<9"
