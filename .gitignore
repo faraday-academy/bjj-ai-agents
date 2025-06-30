@@ -11,3 +11,5 @@ venv/
 *.log
 # Ignore environment variable files
 .env
+# Ignore database files
+*.db
