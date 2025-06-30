@@ -17,7 +17,9 @@ RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 WORKDIR /code
 
 COPY --from=builder /code/requirements.txt ./
-RUN pip install -r requirements.txt
+-RUN pip install -r requirements.txt
++RUN pip install --no-cache-dir -r requirements.txt \
++    && pip install --no-cache-dir ipython>=8,<9
 
 COPY . .
 
