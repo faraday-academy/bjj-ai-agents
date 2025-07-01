@@ -4,7 +4,7 @@ short_description: An AI-enabled BJJ coaching app with specialized agents.
 emoji: 🥋
 colorFrom: blue
 colorTo: purple
-sdk: gradio
+sdk: docker
 sdk_version: 5.35.0
 app_file: app.py
 pinned: false
