@@ -15,7 +15,6 @@ source = { virtual = "." }
 dependencies = [
     { name = "chromadb" },
     { name = "fastapi" },
-    { name = "gradio" },
     { name = "gradio-modal" },
     { name = "ipywidgets" },
     { name = "langchain" },
@@ -35,7 +34,6 @@ dependencies = [
 requires-dist = [
     { name = "chromadb" },
     { name = "fastapi", specifier = ">=0.104.0" },
-    { name = "gradio", specifier = ">=4.0.0" },
     { name = "gradio-modal" },
     { name = "ipywidgets" },
     { name = "langchain" },
