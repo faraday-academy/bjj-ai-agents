@@ -68,6 +68,7 @@ def create_enhanced_ai_chat_tab():
         chatbot = gr.Chatbot(
             [],
             elem_id="chatbot",
+            type="messages",
             bubble_full_width=False,
             avatar_images=(
                 ("images/user_avatar.png"),
