@@ -1,10 +1,10 @@
 from langgraph.graph import StateGraph, END
 from pydantic import BaseModel
 from typing import Optional
-from app.llm_utils import load_prompt, use_llm_clean
-from app.agents.coach_agent import run_coach_agent_with_tools
-from app.agents.game_plan_agent import run_game_plan_agent
-from app.agents.injury_agent import run_injury_agent
+from src.llm_utils import load_prompt, use_llm_clean
+from src.agents.coach_agent import run_coach_agent_with_tools
+from src.agents.game_plan_agent import run_game_plan_agent
+from src.agents.injury_agent import run_injury_agent
 
 
 class TournamentInfo(BaseModel):

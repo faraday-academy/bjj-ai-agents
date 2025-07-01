@@ -1,5 +1,5 @@
 import sqlite3
-from typing import Any, List, Dict, Optional
+from typing import Any, Optional
 
 
 def init_database():
@@ -75,7 +75,7 @@ def init_database():
     conn.close()
 
 
-def save_data_to_sqlite(table: str, data: Dict[str, Any]) -> bool:
+def save_data_to_sqlite(table: str, data: dict[str, Any]) -> bool:
     """Save data to SQLite database"""
     try:
         conn = sqlite3.connect("bjj_app.db")
@@ -97,7 +97,7 @@ def save_data_to_sqlite(table: str, data: Dict[str, Any]) -> bool:
 
 
 def update_data_in_sqlite(
-    table: str, data: Dict[str, Any], where_clause: str, where_args: tuple
+    table: str, data: dict[str, Any], where_clause: str, where_args: tuple
 ) -> bool:
     """Update data in SQLite database"""
     try:
@@ -118,7 +118,7 @@ def update_data_in_sqlite(
         return False
 
 
-def view_all_rows(table_name: str) -> List[tuple]:
+def view_all_rows(table_name: str) -> list[tuple]:
     """View all rows from a table"""
     try:
         conn = sqlite3.connect("bjj_app.db")
@@ -134,7 +134,7 @@ def view_all_rows(table_name: str) -> List[tuple]:
         return []
 
 
-def get_student_by_id(student_id: int) -> Optional[Dict[str, Any]]:
+def get_student_by_id(student_id: int) -> Optional[dict[str, Any]]:
     """Get student information by ID"""
     try:
         conn = sqlite3.connect("bjj_app.db")
@@ -154,7 +154,7 @@ def get_student_by_id(student_id: int) -> Optional[Dict[str, Any]]:
         return None
 
 
-def get_game_plans_by_user(user_id: int) -> List[Dict[str, Any]]:
+def get_game_plans_by_user(user_id: int) -> list[dict[str, Any]]:
     """Get all game plans for a specific user"""
     try:
         conn = sqlite3.connect("bjj_app.db")
@@ -177,7 +177,7 @@ def get_game_plans_by_user(user_id: int) -> List[Dict[str, Any]]:
         return []
 
 
-def get_progress_by_user(user_id: int) -> List[Dict[str, Any]]:
+def get_progress_by_user(user_id: int) -> list[dict[str, Any]]:
     """Get all progress tracking entries for a specific user"""
     try:
         conn = sqlite3.connect("bjj_app.db")
@@ -214,7 +214,7 @@ def save_evaluation_result(
     return save_data_to_sqlite("evaluation_results", data)
 
 
-def save_student_profile(student_data: Dict[str, Any]) -> int:
+def save_student_profile(student_data: dict[str, Any]) -> int:
     """Save or update student profile and return student ID"""
     try:
         conn = sqlite3.connect("bjj_app.db")
@@ -256,7 +256,7 @@ def save_student_profile(student_data: Dict[str, Any]) -> int:
         return -1
 
 
-def get_student_by_name(name: str) -> Optional[Dict[str, Any]]:
+def get_student_by_name(name: str) -> Optional[dict[str, Any]]:
     """Get student information by name"""
     try:
         conn = sqlite3.connect("bjj_app.db")
@@ -276,7 +276,7 @@ def get_student_by_name(name: str) -> Optional[Dict[str, Any]]:
         return None
 
 
-def get_all_students() -> List[Dict[str, Any]]:
+def get_all_students() -> list[dict[str, Any]]:
     """Get all students"""
     try:
         conn = sqlite3.connect("bjj_app.db")

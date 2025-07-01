@@ -1,6 +1,6 @@
 import sqlite3
 import pandas as pd
-from app.llm_utils import use_llm_clean
+from src.llm_utils import use_llm_clean
 
 
 def generate_examples(n=5):
@@ -128,7 +128,7 @@ def save_evaluation_results(
 ):
     """Save evaluation results to database"""
     try:
-        from app.database import save_data_to_sqlite
+        from src.database import save_data_to_sqlite
 
         overall_score = 0.0
         if "coverage" in evaluation_results:

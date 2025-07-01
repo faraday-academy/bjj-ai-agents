@@ -2,18 +2,18 @@ from fastapi import FastAPI
 import gradio as gr
 from gradio_modal import Modal
 
-from app.database import (
+from src.database import (
     init_database,
     view_all_rows,
     save_student_profile,
 )
-from app.agents.coach_agent import run_coach_agent, run_coach_agent_with_tools
-from app.agents.game_plan_agent import run_game_plan_agent, run_game_plan_agent_rag
-from app.agents.router_agent import run_router
-from app.evaluation import generate_examples
+from src.agents.coach_agent import run_coach_agent, run_coach_agent_with_tools
+from src.agents.game_plan_agent import run_game_plan_agent, run_game_plan_agent_rag
+from src.agents.router_agent import run_router
+from src.evaluation import generate_examples
 from config import Config
-from app.user_guide import USER_GUIDE_CONTENT
-from app.agents.coach_agent import track_student_progress
+from src.user_guide import USER_GUIDE_CONTENT
+from src.agents.coach_agent import track_student_progress
 
 
 Config.validate()
@@ -114,7 +114,7 @@ def save_student_info(
 
 
 # Import UI components
-from app.ui_components import (
+from src.ui_components import (
     create_enhanced_ai_chat_tab,
     create_coach_chat_tab,
     create_game_plan_tab,
@@ -126,7 +126,7 @@ from app.ui_components import (
 )
 
 # Override placeholder functions with actual implementations
-import app.ui_components as ui_components
+import src.ui_components as ui_components
 
 ui_components.route_query = route_query
 ui_components.chat_with_coach = chat_with_coach
@@ -171,9 +171,9 @@ with gr.Blocks(title="BJJ AI Agents", theme=gr.themes.Soft()) as demo:
 app = FastAPI()
 gr.mount_gradio_app(app, demo, path="/")
 
-# if __name__ == "__main__":
-#     import os
-#     import uvicorn
+if __name__ == "__main__":
+    import os
+    import uvicorn
 
-#     port = int(os.environ.get("PORT", 7861))
-#     uvicorn.run(app, host="0.0.0.0", port=port)
+    port = int(os.environ.get("PORT", 7861))
+    uvicorn.run(app, host="0.0.0.0", port=port)

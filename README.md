@@ -6,7 +6,7 @@ colorFrom: blue
 colorTo: purple
 sdk: gradio
 sdk_version: 5.35.0
-app_file: main.py
+app_file: app.py
 pinned: false
 ---
 
@@ -58,15 +58,12 @@ The system maintains comprehensive records of:
 ```
 ai_agent_conference/
 │
-├── app/
-│   ├── __init__.py
-│   ├── main.py                # Gradio entry point (was app.py)
+├── src/
 │   ├── config.py
 │   ├── database.py
 │   ├── llm_utils.py
 │   ├── evaluation.py
 │   ├── agents/
-│   │   ├── __init__.py
 │   │   ├── coach_agent.py
 │   │   ├── game_plan_agent.py
 │   │   └── router_agent.py
@@ -75,6 +72,7 @@ ai_agent_conference/
 │   └── ...
 ├── requirements.txt
 ├── pyproject.toml
+├── app.py
 ├── README.md
 └── README_webapp.md
 ```

@@ -3,8 +3,8 @@ from typing import Optional
 from langgraph.graph import StateGraph
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel
-from app.llm_utils import load_prompt, use_llm_clean
-from app.database import save_data_to_sqlite, get_game_plans_by_user
+from src.llm_utils import load_prompt, use_llm_clean
+from src.database import save_data_to_sqlite, get_game_plans_by_user
 
 
 class GamePlanInput(BaseModel):

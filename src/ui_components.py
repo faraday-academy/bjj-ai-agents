@@ -3,7 +3,7 @@ Gradio UI components for the BJJ AI Agents System
 """
 
 import gradio as gr
-from app.user_guide import USER_GUIDE_CONTENT
+from src.user_guide import USER_GUIDE_CONTENT
 
 
 def create_help_section():

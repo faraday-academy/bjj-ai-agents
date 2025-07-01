@@ -1,6 +1,5 @@
 import os
 from pathlib import Path
-from typing import Dict, List
 
 from langchain_openai import ChatOpenAI
 
@@ -16,7 +15,7 @@ def load_prompt(name: str) -> str:
         raise FileNotFoundError(f"Prompt file {name}.txt not found")
 
 
-def list_prompts() -> List[str]:
+def list_prompts() -> list[str]:
     """List all available prompts"""
     prompt_dir = Path("prompts")
     if not prompt_dir.exists():
@@ -31,7 +30,7 @@ def list_prompts() -> List[str]:
     return sorted(prompts)
 
 
-def load_all_prompts() -> Dict[str, str]:
+def load_all_prompts() -> dict[str, str]:
     """Load all prompts into a dictionary"""
     prompts = {}
     for prompt_name in list_prompts():
@@ -77,7 +76,7 @@ def get_llm_instance(
     return ChatOpenAI(model=model_name, temperature=temperature, max_tokens=max_tokens)
 
 
-def format_prompt_with_context(base_prompt: str, context: Dict[str, str]) -> str:
+def format_prompt_with_context(base_prompt: str, context: dict[str, str]) -> str:
     """Format a prompt with context variables"""
     formatted_prompt = base_prompt
     for key, value in context.items():

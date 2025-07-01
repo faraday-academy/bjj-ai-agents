@@ -1,6 +1,6 @@
 from langgraph.graph import StateGraph
 from pydantic import BaseModel
-from app.llm_utils import load_prompt, use_llm_clean
+from src.llm_utils import load_prompt, use_llm_clean
 
 
 class InjuryInput(BaseModel):
