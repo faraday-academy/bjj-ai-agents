@@ -11,7 +11,7 @@ create-db:
 reset-db: delete-db create-db
 
 run:
-	uvicorn main:demo --host 0.0.0.0 --port 7860
+	uv run uvicorn main:app --reload --host 0.0.0.0 --port 7861
 
 # Run the app in development mode (with auto-reload)
 run-dev:

@@ -300,7 +300,7 @@ def create_database_viewer_tab():
             table_name = gr.Dropdown(
                 label="Select Table",
                 choices=[
-                    "student_profiles",
+                    "students",
                     "progress_tracking",
                     "game_plans",
                 ],
