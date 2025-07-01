@@ -169,7 +169,7 @@ with gr.Blocks(title="BJJ AI Agents", theme=gr.themes.Soft()) as demo:
 
 
 app = FastAPI()
-app = gr.mount_gradio_app(app, demo, path="")
+gr.mount_gradio_app(app, demo, path="/")
 
 # if __name__ == "__main__":
 #     import os

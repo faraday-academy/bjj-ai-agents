@@ -185,7 +185,7 @@ def create_progress_tracking_tab(demo, user_profile_state):
 
 
 def create_student_profile_tab(user_profile_state):
-    with gr.Tab("👤 Student Profile Management"):
+    with gr.Tab("👤 Student Profile"):
         gr.Markdown("## 📝 Manage Your Profile")
         gr.Markdown(
             "Keep your profile up-to-date for personalized advice. "
@@ -361,5 +361,47 @@ load_student_info = lambda x: "Student loaded"
 list_all_students = lambda: "All students listed"
 view_database = lambda x: "Database view"
 generate_training_examples = lambda: "Here are some examples"
-add_message = lambda a, b, c: (a, b)
-bot = lambda a, b: (a, b, "Agent: AI Assistant")
+
+
+def add_message(chatbot, chat_history, txt):
+    """Add user message to chat history"""
+    if not txt.strip():
+        return chatbot, chat_history
+
+    # Add user message to history as a tuple with None response
+    chat_history = chat_history or []
+    chat_history.append((txt, None))
+
+    return chat_history, chat_history
+
+
+def bot(chatbot, chat_history):
+    """Get AI response and update chat"""
+    if not chat_history:
+        return chatbot, chat_history, "**Agent:** 🤖 AI Assistant"
+
+    # Get the latest user message from the last tuple
+    last_message = chat_history[-1]
+    if isinstance(last_message, tuple):
+        user_message = last_message[0]  # First element is user message
+    else:
+        # Fallback for dictionary format
+        user_message = last_message.get("content", "")
+
+    if not user_message or not user_message.strip():
+        return chatbot, chat_history, "**Agent:** 🤖 AI Assistant"
+
+    # Get AI response using the router
+    try:
+        response = route_query(user_message)
+    except Exception as e:
+        response = f"Error: {str(e)}"
+
+    # Add AI response to chat history
+    chat_history.append((user_message, response))
+
+    # Determine agent type for badge
+    agent_type, badge_color, text_color = _determine_agent_type(response)
+    badge_html = _create_agent_badge(agent_type, badge_color, text_color)
+
+    return chat_history, chat_history, badge_html

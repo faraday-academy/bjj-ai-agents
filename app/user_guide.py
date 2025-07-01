@@ -6,7 +6,7 @@ USER_GUIDE_CONTENT = """
 # 🥋 BJJ AI Agents System - User Guide
 
 ## 🚀 Getting Started
-1. **Set up your profile first** using the "👤 Student Profile Management" tab
+1. **Set up your profile first** using the "👤 Student Profile" tab
 2. **Try the Enhanced AI Chat** - our premium feature that automatically routes your questions to the best AI agent
 3. **Explore specialized tabs** for specific needs
 
@@ -42,26 +42,13 @@ USER_GUIDE_CONTENT = """
 - Add notes about your progress
 - Include your gender and no-gi level for personalized tracking
 
-### 👤 Student Profile Management
+### 👤 Student Profile
 **What it does**: Create and manage your student profile with personal information.
 **Best for**: Setting up your account, updating personal info
 **How to use**: 
 - Enter your name, age, weight, belt color, and gender
 - Click "Save Student Info" to store your profile
 - Your profile helps personalize AI responses
-
-### 🔍 Student Search
-**What it does**: Find and view student profiles in the system.
-**Best for**: Looking up your own profile or other students
-**How to use**: 
-- Enter a student's name
-- Click "Search" to view their profile information
-
-### 📋 List All Students
-**What it does**: View all students currently in the system.
-**Best for**: Overview of all users, checking if your profile is saved
-**How to use**: 
-- Click "List All Students" to see everyone in the system
 
 ### 🗄️ Database Viewer (Advanced)
 **What it does**: View raw data from the system's database tables.
