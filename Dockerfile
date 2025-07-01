@@ -24,4 +24,4 @@ COPY . .
 
 EXPOSE 7860
 
-CMD ["python", "main.py"]
+CMD ["uvicorn","app:app","--host","0.0.0.0","--port","7861"]
