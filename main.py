@@ -41,11 +41,11 @@ def get_game_plan(tournament_info: str, use_rag: bool = False) -> str:
 
 
 def route_query(history) -> str:
-    # Extract the latest user message from the chat history
+    # Extract the latest user message from the chat history (tuple format)
     user_message = ""
     for msg in reversed(history):
-        if msg["role"] == "user":
-            user_message = msg["content"]
+        if isinstance(msg, tuple) and msg[0]:
+            user_message = msg[0]
             break
     # Call the router agent with the latest user message
     return run_router(user_message)
