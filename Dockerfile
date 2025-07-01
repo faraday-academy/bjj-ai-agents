@@ -2,7 +2,7 @@ FROM python:3.10-slim AS builder
 
 RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /code
+WORKDIR app/
 
 COPY pyproject.toml uv.lock ./
 
@@ -15,9 +15,9 @@ FROM python:3.10-slim
 
 RUN apt-get update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /code
+WORKDIR app/
 
-COPY --from=builder /code/requirements.txt ./
+COPY --from=builder /app/requirements.txt ./
 RUN pip install -r requirements.txt
 
 COPY . .
