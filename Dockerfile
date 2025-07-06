@@ -7,4 +7,4 @@ RUN touch /app/bjj_app.db
 RUN chown -R 1000:1000 /app
 USER 1000
 EXPOSE 7861
-CMD ["python", "app.py"]
+CMD ["python", "main.py"]

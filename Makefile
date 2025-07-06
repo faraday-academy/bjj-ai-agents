@@ -15,4 +15,4 @@ run:
 
 # Run the app in development mode (with auto-reload)
 run-dev:
-	uv run python app.py
+	uv run python main.py

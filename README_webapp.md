@@ -53,7 +53,7 @@ export OPENAI_API_KEY="your-api-key-here"
 
 4. Run the application:
 ```bash
-python app.py
+python main.py
 ```
 
 ## Deployment to Hugging Face Spaces
@@ -67,7 +67,7 @@ python app.py
 ## File Structure
 
 ```
-├── app.py                 # Main Gradio web app
+├── main.py                 # Main Gradio web app
 ├── database.py            # Database operations
 ├── llm_utils.py           # LLM utilities and prompt loading
 ├── coach_agent.py         # BJJ coach agent

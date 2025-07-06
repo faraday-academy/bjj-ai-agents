@@ -6,7 +6,7 @@ colorFrom: blue
 colorTo: purple
 sdk: docker
 sdk_version: 5.35.0
-app_file: app.py
+app_file: main.py
 pinned: false
 ---
 
@@ -72,7 +72,7 @@ ai_agent_conference/
 │   └── ...
 ├── requirements.txt
 ├── pyproject.toml
-├── app.py
+├── main.py
 ├── README.md
 └── README_webapp.md
 ```
