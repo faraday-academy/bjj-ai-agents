@@ -7,7 +7,7 @@ authors = [
 ]
 requires-python = ">=3.10"
 dependencies = [
-    "gradio==5.35.0",
+    "streamlit",
     "langchain",
     "langchain-community",
     "langchain-openai",
@@ -21,6 +21,4 @@ dependencies = [
     "langgraph-checkpoint-sqlite",
     "pandas>=2.0.0",
     "pydantic>=2.0.0",
-    "fastapi>=0.104.0",
-    "gradio_modal",
 ]
